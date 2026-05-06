@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASTRA's Portfolio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg2:#f7f7f5;--bg3:#efefec;
+  --text:#1a1a1a;--text2:#555;--text3:#999;
+  --border:#e4e4dc;--border2:#ccc;
+  --green:#0F6E56;--red:#A32D2D;--blue:#185FA5;--amber:#BA7517;--purple:#534AB7;--teal:#0e7490;
+  --green-bg:#E1F5EE;--red-bg:#FCEBEB;--blue-bg:#E6F1FB;--amber-bg:#FAEEDA;--purple-bg:#EEEDFE;--teal-bg:#e0f2fe;
+  --shadow:0 2px 8px rgba(0,0,0,.08);--radius:8px;--radius-lg:12px;--radius-xl:16px;
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#1a1a18;--bg2:#222220;--bg3:#2a2a28;--text:#f0f0ec;--text2:#aaa;--text3:#666;--border:#333;--border2:#444;--green-bg:#085041;--red-bg:#501313;--blue-bg:#042C53;--amber-bg:#412402;--purple-bg:#26215C;--teal-bg:#0c4a6e;--shadow:0 2px 8px rgba(0,0,0,.3)}
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow:hidden;height:100vh}
+.titlebar{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px;-webkit-app-region:drag;height:50px}
+.app-logo{font-size:17px;font-weight:800;color:#7dd8a4;letter-spacing:-.5px;font-family:'Syne',sans-serif}
+.app-logo span{color:#fff}
+.titlebar-actions{margin-left:auto;display:flex;align-items:center;gap:8px;-webkit-app-region:no-drag}
+.tbar-btn{padding:5px 12px;border-radius:var(--radius);cursor:pointer;font-size:12px;font-weight:500;border:0.5px solid var(--border2);background:transparent;color:var(--text2);transition:all .15s}
+.tbar-btn:hover{background:var(--bg3)}
+.tbar-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.market-bar{background:var(--bg3);border-bottom:1px solid var(--border);padding:5px 20px;display:flex;gap:20px;font-size:11px;color:var(--text3)}
+.market-item{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.market-item .mname{font-weight:500;color:var(--text2)}
+.app{display:flex;height:calc(100vh - 82px)}
+.sidebar{width:185px;background:var(--bg2);border-right:1px solid var(--border);padding:10px 0;flex-shrink:0;overflow-y:auto}
+.nav-sec{padding:6px 14px 3px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-top:6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text2);border-left:2px solid transparent;transition:all .12s}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--bg3);color:var(--text);border-left-color:var(--blue);font-weight:500}
+.nav-icon{font-size:14px;width:18px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--amber);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px}
+.main{flex:1;overflow-y:auto;padding:18px 22px}
+.page{display:none}.page.active{display:block}
+.sumgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.metric{background:var(--bg2);border-radius:var(--radius-lg);padding:13px 15px;border:0.5px solid var(--border)}
+.metric-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:500}
+.metric-value{font-size:20px;font-weight:600;line-height:1.2}
+.metric-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.pos{color:var(--green)}.neg{color:var(--red)}
+.alloc-bar{height:6px;border-radius:3px;overflow:hidden;display:flex;margin-bottom:7px}
+.alloc-seg{height:100%;transition:width .5s}
+.alloc-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:var(--text2);margin-bottom:14px}
+.adot{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+.section{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:15px 17px;margin-bottom:13px}
+.sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+.sec-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px}
+.btn{padding:6px 13px;border-radius:var(--radius);cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;border:0.5px solid transparent}
+.btn-outline{border-color:var(--border2);background:transparent;color:var(--text2)}
+.btn-outline:hover{background:var(--bg2)}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-sm{padding:4px 10px;font-size:11px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:10px;font-weight:600;color:var(--text3);padding:5px 9px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.4px}
+td{padding:9px;border-bottom:0.5px solid var(--border);vertical-align:middle;font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg2)}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px}
+.bb{background:var(--blue-bg);color:var(--blue)}
+.bg{background:var(--green-bg);color:var(--green)}
+.br{background:var(--red-bg);color:var(--red)}
+.ba{background:var(--amber-bg);color:var(--amber)}
+.bp{background:var(--purple-bg);color:var(--purple)}
+.bt{background:var(--teal-bg);color:var(--teal)}
+.live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite;vertical-align:middle}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.stale{background:var(--text3);animation:none}
+.del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:2px 5px;border-radius:4px}
+.del-btn:hover{color:var(--red);background:var(--red-bg)}
+.empty-st{text-align:center;padding:26px;color:var(--text3);font-size:13px}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.cbox{background:var(--bg2);border-radius:var(--radius-lg);padding:15px;border:0.5px solid var(--border)}
+.cbox h4{font-size:10px;font-weight:600;color:var(--text3);margin-bottom:11px;text-transform:uppercase;letter-spacing:.5px}
+.cwrap{position:relative}
+.spinner{display:inline-block;width:9px;height:9px;border:1.5px solid var(--text3);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+.modal-ov.open{display:flex}
+.modal{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-xl);padding:22px;width:420px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:15px}
+.field{margin-bottom:11px}
+.field label{display:block;font-size:10px;color:var(--text3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.field input,.field select{width:100%;padding:7px 9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg2);color:var(--text);font-size:13px;outline:none}
+.field input:focus,.field select:focus{border-color:var(--blue)}
+.modal-act{display:flex;gap:8px;justify-content:flex-end;margin-top:15px}
+.progbar{height:5px;border-radius:3px;background:var(--border);overflow:hidden}
+.progfill{height:100%;border-radius:3px;background:var(--green);transition:width .4s}
+.nav-input{width:88px;padding:4px 6px;border:0.5px solid var(--border2);border-radius:5px;background:var(--bg2);color:var(--text);font-size:12px}
+.search-box{padding:6px 11px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg2);color:var(--text);font-size:13px;width:170px;outline:none}
+.tab-pills{display:flex;gap:3px;background:var(--bg3);padding:3px;border-radius:var(--radius);margin-bottom:13px;width:fit-content}
+.tab-pill{padding:5px 13px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);transition:all .15s;border:none;background:transparent}
+.tab-pill.active{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.ai-chip{display:inline-flex;align-items:center;gap:3px;background:var(--purple-bg);color:var(--purple);font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}
+.filter-row{display:flex;gap:7px;margin-bottom:13px;flex-wrap:wrap}
+.filter-btn{padding:4px 11px;border-radius:20px;border:0.5px solid var(--border2);background:transparent;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s}
+.filter-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.div-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:13px;margin-bottom:9px}
+.div-card:hover{box-shadow:var(--shadow)}
+.sug-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:15px;margin-bottom:9px;transition:all .2s}
+.sug-card:hover{box-shadow:var(--shadow);border-color:var(--blue)}
+.sug-card.hl{border-left:3px solid var(--green)}
+.risk-bar{height:3px;border-radius:2px;background:var(--border);margin-top:8px;overflow:hidden}
+.risk-fill{height:100%;border-radius:2px}
+.saved-note{font-size:11px;color:var(--green);opacity:0;transition:opacity .3s}
+.saved-note.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="titlebar">
+  <div class="app-logo">ASTRA<span>'s Portfolio</span></div>
+  <div style="font-size:11px;color:var(--text3);margin-left:2px">· Indian Markets</div>
+  <div class="titlebar-actions">
+    <span class="saved-note" id="savedNote">✓ Saved</span>
+    <span style="font-size:11px;color:var(--text3)" id="lastUp"></span>
+    <button class="tbar-btn" onclick="fetchPrices()"><span id="refIcon">↻</span> Refresh</button>
+    <button class="tbar-btn" onclick="exportCSV()">Export CSV</button>
+    <button class="tbar-btn primary" onclick="openModal('stock')">+ Add Holding</button>
+  </div>
+</div>
+<div class="market-bar">
+  <div class="market-item"><span class="mname">NIFTY 50</span><span id="m0">—</span></div>
+  <div class="market-item"><span class="mname">SENSEX</span><span id="m1">—</span></div>
+  <div class="market-item"><span class="mname">Bank Nifty</span><span id="m2">—</span></div>
+  <div class="market-item"><span class="mname">Gold</span><span id="m3">—</span></div>
+  <div class="market-item" style="margin-left:auto"><span class="live-dot" id="mktDot" style="margin-right:4px"></span><span style="font-size:10px">Live</span></div>
+</div>
+<div class="app">
+<div class="sidebar">
+  <div class="nav-sec">Portfolio</div>
+  <div class="nav-item active" id="nav-overview" onclick="showPage('overview')"><span class="nav-icon">◎</span>Overview</div>
+  <div class="nav-item" id="nav-stocks" onclick="showPage('stocks')"><span class="nav-icon">📊</span>Stocks</div>
+  <div class="nav-item" id="nav-mf" onclick="showPage('mf')"><span class="nav-icon">💼</span>Mutual Funds</div>
+  <div class="nav-item" id="nav-bonds" onclick="showPage('bonds')"><span class="nav-icon">🏦</span>Bonds</div>
+  <div class="nav-item" id="nav-rd" onclick="showPage('rd')"><span class="nav-icon">🔁</span>RD</div>
+  <div class="nav-sec">Insights</div>
+  <div class="nav-item" id="nav-dividends" onclick="showPage('dividends')"><span class="nav-icon">💰</span>Dividends<span class="nav-badge" id="divBadge" style="display:none">0</span></div>
+  <div class="nav-item" id="nav-suggestions" onclick="showPage('suggestions')"><span class="nav-icon">💡</span>Suggestions</div>
+</div>
+<div class="main">
+
+<!-- OVERVIEW -->
+<div class="page active" id="page-overview">
+  <div style="margin-bottom:22px">
+  <div style="font-size:24px;font-weight:700;font-family:'Syne',sans-serif;letter-spacing:-.5px">Good morning, ASTRA 👋</div>
+  <div style="font-size:13px;color:var(--text3);margin-top:3px" id="dateDisp"></div>
+</div>
+<div class="sumgrid">
+    <div class="metric"><div class="metric-label">Total Value</div><div class="metric-value" id="s-total">—</div><div class="metric-sub" id="s-tsub"></div></div>
+    <div class="metric"><div class="metric-label">Invested</div><div class="metric-value" id="s-inv">—</div></div>
+    <div class="metric"><div class="metric-label">Overall P&L</div><div class="metric-value" id="s-pnl">—</div><div class="metric-sub" id="s-ret"></div></div>
+    <div class="metric"><div class="metric-label">Dividend/yr</div><div class="metric-value pos" id="s-div">—</div></div>
+    <div class="metric"><div class="metric-label">Bond Income/yr</div><div class="metric-value pos" id="s-bond">—</div></div>
+  </div>
+  <div class="section" style="padding:12px 16px">
+    <div style="font-size:10px;font-weight:600;color:var(--text3);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px">Allocation</div>
+    <div class="alloc-bar" id="allocBar"></div>
+    <div class="alloc-legend" id="allocLeg"></div>
+  </div>
+  <div class="cgrid">
+    <div class="cbox"><h4>Allocation</h4><div class="cwrap" style="height:220px"><canvas id="donutC" role="img" aria-label="Allocation chart"></canvas></div></div>
+    <div class="cbox"><h4>P&L by Asset Class</h4><div class="cwrap" style="height:220px"><canvas id="plC" role="img" aria-label="PL chart"></canvas></div></div>
+  </div>
+  <div class="cgrid" style="margin-top:13px">
+    <div class="cbox"><h4>Dividend Calendar (by month)</h4><div class="cwrap" style="height:175px"><canvas id="divC" role="img" aria-label="Dividend chart"></canvas></div></div>
+    <div class="cbox"><h4>Top Holdings</h4><div id="topH"></div></div>
+  </div>
+</div>
+
+<!-- STOCKS -->
+<div class="page" id="page-stocks">
+  <div class="section">
+    <div class="sec-hdr">
+      <span class="sec-title"><span class="live-dot" id="liveDot"></span>Stocks</span>
+      <div style="display:flex;gap:6px">
+        <input class="search-box" id="sSearch" placeholder="Search..." oninput="renderStocks()">
+        <button class="btn btn-primary" onclick="openModal('stock')">+ Add</button>
+      </div>
+    </div>
+    <table><thead><tr><th>Symbol</th><th>Company</th><th>Qty</th><th>Avg Cost</th><th>LTP</th><th>Value</th><th>P&L</th><th>Return</th><th>Div/Share</th><th></th></tr></thead>
+    <tbody id="stocksBody"></tbody></table>
+  </div>
+  <p style="font-size:11px;color:var(--text3)">NSE format: TCS.NS · BSE format: TCS.BO</p>
+</div>
+
+<!-- MF -->
+<div class="page" id="page-mf">
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-title">Mutual Funds</span><button class="btn btn-primary" onclick="openModal('mf')">+ Add</button></div>
+    <table><thead><tr><th>Scheme</th><th>Category</th><th>Units</th><th>Avg NAV</th><th>Current NAV</th><th>Value</th><th>P&L</th><th>Return</th><th></th></tr></thead>
+    <tbody id="mfBody"></tbody></table>
+  </div>
+</div>
+
+<!-- BONDS -->
+<div class="page" id="page-bonds">
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-title">Bonds / Debentures</span><button class="btn btn-primary" onclick="openModal('bond')">+ Add</button></div>
+    <table><thead><tr><th>Issuer</th><th>Type</th><th>Face Val</th><th>Units</th><th>Coupon%</th><th>Maturity</th><th>Invested</th><th>Annual Income</th><th></th></tr></thead>
+    <tbody id="bondsBody"></tbody></table>
+  </div>
+</div>
+
+<!-- RD -->
+<div class="page" id="page-rd">
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-title">Recurring Deposits</span><button class="btn btn-primary" onclick="openModal('rd')">+ Add</button></div>
+    <table><thead><tr><th>Bank</th><th>Monthly</th><th>Rate%</th><th>Tenure</th><th>Started</th><th>Progress</th><th>Maturity Amt</th><th>Interest Earned</th><th></th></tr></thead>
+    <tbody id="rdBody"></tbody></table>
+  </div>
+</div>
+
+<!-- DIVIDENDS -->
+<div class="page" id="page-dividends">
+  <div class="sec-hdr" style="margin-bottom:10px">
+    <span class="sec-title">💰 Dividend Tracker</span>
+    <button class="btn btn-outline btn-sm" onclick="openModal('dividend')">+ Add Dividend</button>
+  </div>
+  <div class="tab-pills">
+    <button class="tab-pill active" onclick="switchDivTab('upcoming',this)">Upcoming</button>
+    <button class="tab-pill" onclick="switchDivTab('history',this)">History</button>
+    <button class="tab-pill" onclick="switchDivTab('summary',this)">Summary</button>
+  </div>
+  <div id="dt-upcoming"></div>
+  <div id="dt-history" style="display:none"></div>
+  <div id="dt-summary" style="display:none"></div>
+</div>
+
+<!-- SUGGESTIONS -->
+<div class="page" id="page-suggestions">
+  <div class="sec-hdr" style="margin-bottom:10px">
+    <span class="sec-title">💡 Smart Investment Suggestions <span class="ai-chip">✦ AI</span></span>
+  </div>
+  <div class="filter-row" id="sugFilt">
+    <button class="filter-btn active" onclick="filterSug('all',this)">All</button>
+    <button class="filter-btn" onclick="filterSug('stock',this)">Stocks</button>
+    <button class="filter-btn" onclick="filterSug('mf',this)">Mutual Funds</button>
+    <button class="filter-btn" onclick="filterSug('bond',this)">Bonds</button>
+    <button class="filter-btn" onclick="filterSug('low',this)">Low Risk</button>
+    <button class="filter-btn" onclick="filterSug('div',this)">High Dividend</button>
+  </div>
+  <div id="sugGrid"></div>
+</div>
+
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-ov" id="mOv">
+  <div class="modal">
+    <h3 id="mTitle">Add</h3>
+    <div id="mFields"></div>
+    <div class="modal-act">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLS=['#185FA5','#0F6E56','#BA7517','#A32D2D','#534AB7','#0e7490'];
+const fmt=n=>n==null?'—':'₹'+Math.round(n).toLocaleString('en-IN');
+const pct=(a,b)=>a&&b?((b-a)/a*100).toFixed(1)+'%':'—';
+const ds=d=>d?new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—';
+
+let P=JSON.parse(localStorage.getItem('ptpro2')||'null')||{
+  stocks:[
+    {id:1,symbol:'RELIANCE.NS',name:'Reliance Industries',qty:10,avgCost:2450,ltp:null,div:10},
+    {id:2,symbol:'TCS.NS',name:'Tata Consultancy Services',qty:5,avgCost:3800,ltp:null,div:46},
+    {id:3,symbol:'HDFCBANK.NS',name:'HDFC Bank',qty:8,avgCost:1650,ltp:null,div:19},
+    {id:4,symbol:'INFY.NS',name:'Infosys Ltd',qty:12,avgCost:1420,ltp:null,div:21}
+  ],
+  mf:[
+    {id:1,scheme:'Parag Parikh Flexi Cap',cat:'Flexi Cap',units:150,avgNav:55,currNav:68},
+    {id:2,scheme:'Mirae Asset Large Cap',cat:'Large Cap',units:200,avgNav:78,currNav:92},
+    {id:3,scheme:'SBI Small Cap Fund',cat:'Small Cap',units:80,avgNav:110,currNav:148}
+  ],
+  bonds:[
+    {id:1,issuer:'HDFC Ltd NCD',type:'NCD',face:1000,coupon:8.5,maturity:'2026-09',units:10},
+    {id:2,issuer:'REC Ltd Bond',type:'Govt Bond',face:1000,coupon:7.9,maturity:'2027-03',units:5}
+  ],
+  rd:[
+    {id:1,bank:'SBI',monthly:5000,rate:6.8,tenure:24,start:'2024-01'},
+    {id:2,bank:'HDFC Bank',monthly:3000,rate:7.1,tenure:12,start:'2024-06'}
+  ],
+  dividends:[
+    {id:1,co:'Reliance Industries',sym:'RELIANCE.NS',exDate:'2025-08-15',recDate:'2025-08-16',payDate:'2025-09-10',amt:10,qty:10,status:'upcoming',freq:'Annual',prev:[9,8.5,7,6]},
+    {id:2,co:'TCS',sym:'TCS.NS',exDate:'2025-07-10',recDate:'2025-07-11',payDate:'2025-08-05',amt:46,qty:5,status:'upcoming',freq:'Quarterly',prev:[43,40,38,35]},
+    {id:3,co:'HDFC Bank',sym:'HDFCBANK.NS',exDate:'2025-05-20',recDate:'2025-05-21',payDate:'2025-06-15',amt:19,qty:8,status:'paid',freq:'Annual',prev:[16.5,15,13,11]},
+    {id:4,co:'Infosys',sym:'INFY.NS',exDate:'2025-06-10',recDate:'2025-06-11',payDate:'2025-07-01',amt:21,qty:12,status:'paid',freq:'Semi-Annual',prev:[18,17,16,15]},
+    {id:5,co:'ITC Ltd',sym:'ITC.NS',exDate:'2025-09-05',recDate:'2025-09-06',payDate:'2025-10-01',amt:7.5,qty:50,status:'upcoming',freq:'Annual',prev:[6.5,6,5.5,5]}
+  ]
+};
+
+let nid=300,mType='',dC=null,pC=null,dvC=null,curPage='overview',curDivTab='upcoming',sugF='all';
+
+function save(){
+  localStorage.setItem('ptpro2',JSON.stringify(P));
+  const n=document.getElementById('savedNote');n.classList.add('show');setTimeout(()=>n.classList.remove('show'),2000);
+}
+
+function rdMat(r){const P2=r.monthly,n=r.tenure,R=r.rate/100/12;return Math.round(P2*(Math.pow(1+R,n)-1)/R*(1+R))}
+function rdDone(r){if(!r.start)return 0;const[y,m]=r.start.split('-').map(Number);return Math.min(r.tenure,Math.max(0,Math.round((new Date()-new Date(y,m-1,1))/(1000*60*60*24*30.44))))}
+function rdInt(r){const d=rdDone(r),P2=r.monthly,R=r.rate/100/12;if(!d)return 0;return Math.round(P2*(Math.pow(1+R,d)-1)/R*(1+R))-d*P2}
+
+function tots(){
+  return{
+    stocks:P.stocks.reduce((a,s)=>a+(s.ltp?s.qty*s.ltp:s.qty*s.avgCost),0),
+    mf:P.mf.reduce((a,f)=>a+f.units*f.currNav,0),
+    bonds:P.bonds.reduce((a,b)=>a+b.face*b.units,0),
+    rd:P.rd.reduce((a,r)=>a+rdDone(r)*r.monthly,0)
+  };
+}
+
+function renderSummary(){
+  const t=tots(),total=t.stocks+t.mf+t.bonds+t.rd;
+  const inv=P.stocks.reduce((a,s)=>a+s.qty*s.avgCost,0)+P.mf.reduce((a,f)=>a+f.units*f.avgNav,0)+P.bonds.reduce((a,b)=>a+b.face*b.units,0)+P.rd.reduce((a,r)=>a+rdDone(r)*r.monthly,0);
+  const pnl=total-inv,ret=inv?(pnl/inv*100).toFixed(1):0;
+  const bInc=P.bonds.reduce((a,b)=>a+b.face*b.units*b.coupon/100,0);
+  const dInc=P.dividends.reduce((a,d)=>a+d.amt*d.qty,0);
+  document.getElementById('s-total').textContent=fmt(total);
+  document.getElementById('s-tsub').textContent='Portfolio value';
+  document.getElementById('s-inv').textContent=fmt(inv);
+  const pe=document.getElementById('s-pnl');pe.textContent=(pnl>=0?'+':'')+fmt(pnl);pe.className='metric-value '+(pnl>=0?'pos':'neg');
+  document.getElementById('s-ret').textContent=(ret>=0?'+':'')+ret+'% overall';
+  document.getElementById('s-bond').textContent=fmt(bInc);
+  document.getElementById('s-div').textContent=fmt(dInc);
+  const segs=[{l:'Stocks',v:t.stocks,c:COLS[0]},{l:'MF',v:t.mf,c:COLS[1]},{l:'Bonds',v:t.bonds,c:COLS[2]},{l:'RD',v:t.rd,c:COLS[3]}];
+  const tot2=total||1;
+  document.getElementById('allocBar').innerHTML=segs.map(s=>`<div class="alloc-seg" style="width:${(s.v/tot2*100).toFixed(1)}%;background:${s.c}"></div>`).join('');
+  document.getElementById('allocLeg').innerHTML=segs.map(s=>`<span><span class="adot" style="background:${s.c}"></span>${s.l} ${(s.v/tot2*100).toFixed(0)}% · ${fmt(s.v)}</span>`).join('');
+  const all=[];
+  P.stocks.forEach(s=>all.push({n:s.symbol.replace('.NS','').replace('.BO',''),v:s.ltp?s.qty*s.ltp:s.qty*s.avgCost,c:COLS[0]}));
+  P.mf.forEach(f=>all.push({n:f.scheme.split(' ').slice(0,3).join(' '),v:f.units*f.currNav,c:COLS[1]}));
+  all.sort((a,b)=>b.v-a.v);
+  const mx=all[0]?.v||1;
+  document.getElementById('topH').innerHTML=all.slice(0,6).map(h=>`
+    <div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:500">${h.n}</span><span style="color:var(--text2)">${fmt(h.v)}</span></div>
+    <div class="progbar"><div class="progfill" style="width:${(h.v/mx*100).toFixed(0)}%;background:${h.c}"></div></div></div>`).join('');
+  const upcount=P.dividends.filter(d=>d.status==='upcoming').length;
+  const db=document.getElementById('divBadge');db.textContent=upcount;db.style.display=upcount?'':'none';
+}
+
+function renderStocks(){
+  const q=(document.getElementById('sSearch')||{}).value||'';
+  const tb=document.getElementById('stocksBody');
+  const fl=P.stocks.filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase())||s.symbol.toLowerCase().includes(q.toLowerCase()));
+  if(!fl.length){tb.innerHTML='<tr><td colspan="10" class="empty-st">No stocks found.</td></tr>';return;}
+  tb.innerHTML=fl.map(s=>{
+    const val=s.ltp?s.qty*s.ltp:null,cost=s.qty*s.avgCost,pnl=val?val-cost:null;
+    return`<tr><td><span class="badge bb">${s.symbol.replace('.NS','').replace('.BO','')}</span></td>
+      <td style="font-weight:500">${s.name}</td>
+      <td><input class="nav-input" type="number" value="${s.qty}" min="1" style="width:62px" onchange="updStock(${s.id},'qty',this.value)"></td>
+      <td><input class="nav-input" type="number" value="${s.avgCost}" min="0" step="0.01" style="width:76px" onchange="updStock(${s.id},'avgCost',this.value)"></td>
+      <td style="font-weight:600">${s.ltp?fmt(s.ltp):'<span style="color:var(--text3)">—</span>'}</td>
+      <td>${fmt(val||cost)}</td>
+      <td class="${pnl!=null?(pnl>=0?'pos':'neg'):''}">${pnl!=null?(pnl>=0?'+':'')+fmt(pnl):'—'}</td>
+      <td class="${pnl!=null?(pnl>=0?'pos':'neg'):''}">${pnl!=null?(pnl>=0?'+':'')+pct(cost,val):'—'}</td>
+      <td><span class="badge bg">₹${s.div||0}/sh</span></td>
+      <td><button class="del-btn" onclick="del('stocks',${s.id})">×</button></td></tr>`;
+  }).join('');
+}
+
+function renderMF(){
+  const tb=document.getElementById('mfBody');
+  if(!P.mf.length){tb.innerHTML='<tr><td colspan="9" class="empty-st">No mutual funds yet.</td></tr>';return;}
+  tb.innerHTML=P.mf.map(f=>{
+    const val=f.units*f.currNav,cost=f.units*f.avgNav,pnl=val-cost;
+    return`<tr><td style="font-weight:500">${f.scheme}</td><td><span class="badge bp">${f.cat||'—'}</span></td>
+      <td>${f.units}</td><td>${fmt(f.avgNav)}</td>
+      <td><input class="nav-input" type="number" value="${f.currNav}" onchange="updNav(${f.id},this.value)"></td>
+      <td style="font-weight:600">${fmt(val)}</td>
+      <td class="${pnl>=0?'pos':'neg'}">${pnl>=0?'+':''}${fmt(pnl)}</td>
+      <td class="${pnl>=0?'pos':'neg'}">${pnl>=0?'+':''}${pct(cost,val)}</td>
+      <td><button class="del-btn" onclick="del('mf',${f.id})">×</button></td></tr>`;
+  }).join('');
+}
+function updNav(id,v){const f=P.mf.find(x=>x.id===id);if(f){f.currNav=parseFloat(v)||f.currNav;save();renderSummary();}}
+
+function renderBonds(){
+  const tb=document.getElementById('bondsBody');
+  if(!P.bonds.length){tb.innerHTML='<tr><td colspan="9" class="empty-st">No bonds yet.</td></tr>';return;}
+  tb.innerHTML=P.bonds.map(b=>{
+    const inv=b.face*b.units,inc=inv*b.coupon/100;
+    return`<tr><td style="font-weight:500">${b.issuer}</td><td><span class="badge bt">${b.type||'Bond'}</span></td>
+      <td>${fmt(b.face)}</td><td>${b.units}</td><td><span class="badge ba">${b.coupon}%</span></td>
+      <td>${b.maturity||'—'}</td><td>${fmt(inv)}</td><td class="pos" style="font-weight:600">${fmt(inc)}</td>
+      <td><button class="del-btn" onclick="del('bonds',${b.id})">×</button></td></tr>`;
+  }).join('');
+}
+
+function renderRD(){
+  const tb=document.getElementById('rdBody');
+  if(!P.rd.length){tb.innerHTML='<tr><td colspan="9" class="empty-st">No RDs yet.</td></tr>';return;}
+  tb.innerHTML=P.rd.map(r=>{
+    const mat=rdMat(r),done=rdDone(r),p=Math.round(done/r.tenure*100);
+    return`<tr><td><span class="badge bg">${r.bank}</span></td><td>${fmt(r.monthly)}/mo</td><td>${r.rate}%</td><td>${r.tenure}mo</td><td>${r.start||'—'}</td>
+      <td style="min-width:110px"><div style="display:flex;align-items:center;gap:5px"><div class="progbar" style="flex:1"><div class="progfill" style="width:${p}%"></div></div><span style="font-size:10px;color:var(--text3)">${done}/${r.tenure}</span></div></td>
+      <td style="font-weight:600">${fmt(mat)}</td><td class="pos">${fmt(rdInt(r))}</td>
+      <td><button class="del-btn" onclick="del('rd',${r.id})">×</button></td></tr>`;
+  }).join('');
+}
+
+function renderDividends(){
+  const now=new Date();
+  const up=P.dividends.filter(d=>d.status==='upcoming').sort((a,b)=>new Date(a.exDate)-new Date(b.exDate));
+  const hist=P.dividends.filter(d=>d.status==='paid').sort((a,b)=>new Date(b.payDate)-new Date(a.payDate));
+
+  function card(d){
+    const total=d.amt*d.qty;
+    const daysLeft=Math.round((new Date(d.exDate)-now)/(1000*60*60*24));
+    const growth=d.prev&&d.prev.length?((d.amt-d.prev[0])/d.prev[0]*100).toFixed(1):null;
+    const allVals=[...(d.prev||[])].reverse().concat([d.amt]);
+    const maxV=Math.max(...allVals)||1;
+    return`<div class="div-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-weight:600;font-size:13px">${d.co} <span class="badge bb" style="font-size:9px">${(d.sym||'').replace('.NS','')}</span></div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">${d.freq||'Annual'} · ${d.qty} shares</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:19px;font-weight:700;color:var(--green)">${fmt(total)}</div>
+          <div style="font-size:11px;color:var(--text3)">₹${d.amt}/share</div>
+          ${growth?`<div style="font-size:10px" class="${parseFloat(growth)>=0?'pos':'neg'}">${parseFloat(growth)>=0?'↑':'↓'} ${Math.abs(growth)}% vs last</div>`:''}
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;font-size:11px;color:var(--text3);flex-wrap:wrap;margin-bottom:8px">
+        <span>📅 Ex-Date: <strong style="color:var(--text)">${ds(d.exDate)}</strong> ${d.status==='upcoming'&&daysLeft>=0?`<span style="color:var(--amber);font-weight:600">(${daysLeft}d)</span>`:''}</span>
+        <span>📋 Record: ${ds(d.recDate)}</span>
+        <span>💳 Pay: ${ds(d.payDate)}</span>
+      </div>
+      ${allVals.length>1?`<div style="margin-bottom:8px">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Dividend trend (₹/share)</div>
+        <div style="display:flex;align-items:flex-end;gap:3px;height:28px">
+          ${allVals.map((v,i)=>{const h=Math.round((v/maxV)*100);const last=i===allVals.length-1;
+            return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px">
+              <div style="width:100%;height:${h}%;min-height:3px;background:${last?COLS[1]:COLS[0]};border-radius:2px 2px 0 0;opacity:${last?1:.6}"></div>
+              <div style="font-size:8px;color:var(--text3)">₹${v}</div></div>`;}).join('')}
+        </div></div>`:''}
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:${d.status==='upcoming'?'var(--amber-bg)':'var(--green-bg)'};color:${d.status==='upcoming'?'var(--amber)':'var(--green)'}">${d.status==='upcoming'?'⏳ Upcoming':'✓ Paid'}</span>
+        <button class="del-btn" onclick="del('dividends',${d.id})">×</button>
+      </div></div>`;
+  }
+
+  document.getElementById('dt-upcoming').innerHTML=up.length?up.map(card).join(''):'<div class="empty-st">No upcoming dividends.</div>';
+  document.getElementById('dt-history').innerHTML=hist.length?hist.map(card).join(''):'<div class="empty-st">No dividend history yet.</div>';
+  const totalInc=P.dividends.reduce((a,d)=>a+d.amt*d.qty,0);
+  const byC={};P.dividends.forEach(d=>{byC[d.co]=(byC[d.co]||0)+d.amt*d.qty});
+  document.getElementById('dt-summary').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+      <div class="metric"><div class="metric-label">Total Dividend</div><div class="metric-value pos">${fmt(totalInc)}</div></div>
+      <div class="metric"><div class="metric-label">Upcoming</div><div class="metric-value">${up.length} payments</div></div>
+      <div class="metric"><div class="metric-label">Received</div><div class="metric-value">${hist.length} payments</div></div>
+    </div>
+    <div class="section"><div class="sec-title" style="margin-bottom:11px;font-size:13px">By Company</div>
+    ${Object.entries(byC).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px">
+        <span style="font-weight:500">${c}</span><span class="pos" style="font-weight:600">${fmt(v)}</span></div>`).join('')}</div>`;
+}
+
+function switchDivTab(t,el){
+  curDivTab=t;
+  document.querySelectorAll('.tab-pill').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+  ['upcoming','history','summary'].forEach(x=>document.getElementById('dt-'+x).style.display=x===t?'block':'none');
+}
+
+const SUGS=[
+  {id:1,name:'Nifty 50 Index Fund',type:'mf',by:'Multiple AMCs',reason:'Your portfolio is equity-heavy in individual stocks. A Nifty index fund adds passive diversification at very low cost.',m:{Returns:'12-14% CAGR',Expense:'0.1-0.2%','Min SIP':'₹500'},risk:'low',tag:'Index Fund',hl:true,divY:null},
+  {id:2,name:'Sovereign Gold Bond (SGB)',type:'bond',by:'RBI',reason:'SGBs act as a hedge against your equity exposure. Earn 2.5% annual interest plus gold price appreciation — completely tax-free at maturity.',m:{Returns:'2.5%+Gold',Tenure:'8 years','Min Invest':'₹5,000'},risk:'low',tag:'Govt Bond',hl:true,divY:null},
+  {id:3,name:'ITC Ltd',type:'stock',by:'NSE: ITC',reason:'One of India\'s highest dividend yield stocks at ~3.5%. Consistent payer with a diversified FMCG+Hotels+Agri business.',m:{'Div Yield':'3.5%','P/E':'26x',Sector:'FMCG'},risk:'low',tag:'Div Stock',hl:false,divY:3.5},
+  {id:4,name:'ICICI Pru Corporate Bond Fund',type:'mf',by:'ICICI AMC',reason:'Reduces portfolio volatility. Invests in high-rated corporate bonds giving steady 7-8% returns — ideal for rebalancing equity-heavy portfolios.',m:{Returns:'7-8%',Expense:'0.5%',Category:'Debt MF'},risk:'low',tag:'Debt Fund',hl:false,divY:null},
+  {id:5,name:'Axis Small Cap Fund',type:'mf',by:'Axis AMC',reason:'Your portfolio lacks small-cap exposure. This fund has strong long-term returns for a 5+ year horizon.',m:{Returns:'18-22% CAGR',Expense:'0.7%','Min SIP':'₹1,000'},risk:'high',tag:'Small Cap',hl:false,divY:null},
+  {id:6,name:'Coal India Ltd',type:'stock',by:'NSE: COALINDIA',reason:'PSU stock with one of the highest dividend yields in India (~7%). Government-backed with regular, substantial dividends.',m:{'Div Yield':'7%','P/E':'8x',Sector:'Mining'},risk:'medium',tag:'PSU Div',hl:true,divY:7},
+  {id:7,name:'REC Ltd Bond (54EC)',type:'bond',by:'REC Limited',reason:'Capital gains tax exemption under Section 54EC. Government-backed infrastructure bond — safe and tax-efficient.',m:{Coupon:'5.25%',Tenure:'5 years','Tax Benefit':'Sec 54EC'},risk:'low',tag:'Infra Bond',hl:false,divY:null},
+  {id:8,name:'HDFC Nifty Next 50',type:'mf',by:'HDFC AMC',reason:'Captures the next set of large companies entering Nifty 50. Great complement to your existing large-cap stocks.',m:{Returns:'13-15% CAGR',Expense:'0.3%','Min SIP':'₹1,000'},risk:'medium',tag:'Mid Large',hl:false,divY:null},
+  {id:9,name:'Post Office RD',type:'rd',by:'India Post',reason:'Government-guaranteed RD at 6.7% p.a. Safer than most bank RDs with sovereign guarantee — good for conservative allocation.',m:{Rate:'6.7% p.a.',Tenure:'5 years',Backed:'Govt of India'},risk:'low',tag:'Safe RD',hl:false,divY:null},
+  {id:10,name:'Power Grid Corp',type:'stock',by:'NSE: POWERGRID',reason:'Stable PSU utility with predictable cash flows and a high dividend yield of ~5%. Good for passive income portfolio.',m:{'Div Yield':'5%','P/E':'18x',Sector:'Power'},risk:'low',tag:'Dividend',hl:false,divY:5}
+];
+
+function renderSuggestions(f='all'){
+  const fl=SUGS.filter(s=>{
+    if(f==='all')return true;
+    if(f==='stock')return s.type==='stock';
+    if(f==='mf')return s.type==='mf';
+    if(f==='bond')return s.type==='bond';
+    if(f==='low')return s.risk==='low';
+    if(f==='div')return s.divY&&s.divY>=3;
+    return true;
+  });
+  const tC={mf:'bp',stock:'bb',bond:'bt',rd:'bg'};
+  document.getElementById('sugGrid').innerHTML=fl.map(s=>`
+    <div class="sug-card ${s.hl?'hl':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">
+        <div>
+          <span style="font-weight:600;font-size:13px">${s.name}</span>
+          ${s.hl?'<span class="ai-chip" style="margin-left:6px;font-size:9px">✦ Top Pick</span>':''}
+        </div>
+        <span class="badge ${tC[s.type]||'bb'}">${s.tag}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:7px">${s.by}</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:9px">${s.reason}</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        ${Object.entries(s.m).map(([k,v])=>`<div><div style="font-size:10px;color:var(--text3)">${k}</div><div style="font-size:12px;font-weight:600">${v}</div></div>`).join('')}
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+        <div style="flex:1;margin-right:12px">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:3px">Risk: ${s.risk}</div>
+          <div class="risk-bar"><div class="risk-fill" style="width:${s.risk==='low'?33:s.risk==='medium'?66:95}%;background:${s.risk==='low'?'var(--green)':s.risk==='medium'?'var(--amber)':'var(--red)'}"></div></div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="addFromSug(${s.id})">+ Add to Portfolio</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterSug(f,el){sugF=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderSuggestions(f)}
+function addFromSug(id){const s=SUGS.find(x=>x.id===id);if(s){openModal(s.type==='rd'?'rd':s.type==='bond'?'bond':s.type==='mf'?'mf':'stock')}}
+
+function renderCharts(){
+  const t=tots();
+  if(dC)dC.destroy();
+  dC=new Chart(document.getElementById('donutC'),{
+    type:'doughnut',
+    data:{labels:['Stocks','MF','Bonds','RD'],datasets:[{data:[t.stocks,t.mf,t.bonds,t.rd],backgroundColor:COLS,borderWidth:2,borderColor:'transparent'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:9,boxWidth:9}}}}
+  });
+  const plVals=[
+    P.stocks.reduce((a,s)=>a+(s.ltp?s.qty*(s.ltp-s.avgCost):0),0),
+    P.mf.reduce((a,f)=>a+f.units*(f.currNav-f.avgNav),0),0,
+    P.rd.reduce((a,r)=>a+rdInt(r),0)
+  ];
+  if(pC)pC.destroy();
+  pC=new Chart(document.getElementById('plC'),{
+    type:'bar',
+    data:{labels:['Stocks','MF','Bonds','RD'],datasets:[{data:plVals,backgroundColor:plVals.map(v=>v>=0?COLS[1]:COLS[3]),borderRadius:6,borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+Math.abs(Math.round(v)).toLocaleString('en-IN'),font:{size:10}},grid:{color:'rgba(128,128,128,.07)'}},x:{ticks:{font:{size:11}},grid:{display:false}}}}
+  });
+  const byM=new Array(12).fill(0);
+  P.dividends.forEach(d=>{if(d.payDate){byM[new Date(d.payDate).getMonth()]+=d.amt*d.qty}});
+  if(dvC)dvC.destroy();
+  dvC=new Chart(document.getElementById('divC'),{
+    type:'bar',
+    data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],datasets:[{data:byM,backgroundColor:COLS[1],borderRadius:4,borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+Math.round(v).toLocaleString('en-IN'),font:{size:10}},grid:{color:'rgba(128,128,128,.07)'}},x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+
+function updStock(id,field,val){
+  const s=P.stocks.find(x=>x.id===id);
+  if(s){s[field]=parseFloat(val)||s[field];save();renderSummary();renderStocks();}
+}
+
+function render(){
+  renderSummary();renderStocks();renderMF();renderBonds();renderRD();renderDividends();renderSuggestions(sugF);
+  if(curPage==='overview')renderCharts();
+}
+
+function del(type,id){if(!confirm('Remove?'))return;P[type]=P[type].filter(x=>x.id!==id);save();render()}
+
+function showPage(p){
+  curPage=p;
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('nav-'+p).classList.add('active');
+  if(p==='overview')setTimeout(renderCharts,50);
+}
+
+const mCfg={
+  stock:{title:'Add Stock',fields:[{k:'symbol',l:'NSE Symbol (e.g. TCS.NS)',t:'text',p:'INFY.NS'},{k:'name',l:'Company Name',t:'text',p:'Infosys Ltd'},{k:'qty',l:'Quantity',t:'number',p:'10'},{k:'avgCost',l:'Avg Buy Price (₹)',t:'number',p:'1500'},{k:'div',l:'Annual Dividend/Share (₹)',t:'number',p:'0'}]},
+  mf:{title:'Add Mutual Fund',fields:[{k:'scheme',l:'Scheme Name',t:'text',p:'Axis Bluechip'},{k:'cat',l:'Category',t:'select',o:['Large Cap','Mid Cap','Small Cap','Flexi Cap','ELSS','Debt','Index','Hybrid']},{k:'units',l:'Units',t:'number',p:'100'},{k:'avgNav',l:'Avg NAV (₹)',t:'number',p:'50'},{k:'currNav',l:'Current NAV (₹)',t:'number',p:'65'}]},
+  bond:{title:'Add Bond',fields:[{k:'issuer',l:'Issuer Name',t:'text',p:'REC Ltd Bond'},{k:'type',l:'Type',t:'select',o:['NCD','Govt Bond','Infra Bond','Corporate Bond','PSU Bond']},{k:'face',l:'Face Value (₹)',t:'number',p:'1000'},{k:'units',l:'Number of Bonds',t:'number',p:'10'},{k:'coupon',l:'Coupon Rate (%)',t:'number',p:'8.5'},{k:'maturity',l:'Maturity (YYYY-MM)',t:'text',p:'2027-06'}]},
+  rd:{title:'Add RD',fields:[{k:'bank',l:'Bank / NBFC',t:'text',p:'HDFC Bank'},{k:'monthly',l:'Monthly Amount (₹)',t:'number',p:'5000'},{k:'rate',l:'Rate (%)',t:'number',p:'7.0'},{k:'tenure',l:'Tenure (months)',t:'number',p:'24'},{k:'start',l:'Start Month (YYYY-MM)',t:'text',p:'2025-01'}]},
+  dividend:{title:'Add Dividend',fields:[{k:'co',l:'Company Name',t:'text',p:'Reliance Industries'},{k:'sym',l:'NSE Symbol',t:'text',p:'RELIANCE.NS'},{k:'amt',l:'Dividend/Share (₹)',t:'number',p:'10'},{k:'qty',l:'Shares Held',t:'number',p:'10'},{k:'exDate',l:'Ex-Dividend Date',t:'date',p:''},{k:'payDate',l:'Pay Date',t:'date',p:''},{k:'freq',l:'Frequency',t:'select',o:['Annual','Semi-Annual','Quarterly','Special']},{k:'status',l:'Status',t:'select',o:['upcoming','paid']}]}
+};
+
+function openModal(type){
+  mType=type;const cfg=mCfg[type];
+  document.getElementById('mTitle').textContent=cfg.title;
+  document.getElementById('mFields').innerHTML=cfg.fields.map(f=>{
+    if(f.t==='select')return`<div class="field"><label>${f.l}</label><select id="mf_${f.k}">${f.o.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+    return`<div class="field"><label>${f.l}</label><input id="mf_${f.k}" type="${f.t}" placeholder="${f.p||''}"></div>`;
+  }).join('');
+  document.getElementById('mOv').classList.add('open');
+  const first=document.querySelector('#mFields input,#mFields select');if(first)first.focus();
+}
+function closeModal(){document.getElementById('mOv').classList.remove('open')}
+function saveModal(){
+  const cfg=mCfg[mType];const obj={id:nid++};
+  for(const f of cfg.fields){const el=document.getElementById('mf_'+f.k);obj[f.k]=f.t==='number'?parseFloat(el.value)||0:el.value}
+  if(mType==='dividend')obj.prev=[];
+  const key=mType==='stock'?'stocks':mType==='mf'?'mf':mType==='bond'?'bonds':mType==='rd'?'rd':'dividends';
+  P[key].push(obj);closeModal();save();render();
+  if(mType==='stock')fetchPrices();
+}
+document.getElementById('mOv').addEventListener('click',e=>{if(e.target===document.getElementById('mOv'))closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+const mktSyms=[{s:'^NSEI',el:'m0'},{s:'^BSESN',el:'m1'},{s:'^NSEBANK',el:'m2'},{s:'GC=F',el:'m3'}];
+async function fetchMarket(){
+  for(const idx of mktSyms){
+    try{
+      const url=`https://query1.finance.yahoo.com/v8/finance/chart/${idx.s}?interval=1d&range=1d`;
+      const r=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+      const d=await r.json();const meta=d?.chart?.result?.[0]?.meta;
+      if(meta){const p=meta.regularMarketPrice,prev=meta.chartPreviousClose||meta.previousClose;const chg=p-prev,pc=(chg/prev*100).toFixed(2);
+        const el=document.getElementById(idx.el);
+        if(el)el.innerHTML=`<span style="font-weight:500;color:var(--text)">${Math.round(p).toLocaleString('en-IN')}</span> <span class="${chg>=0?'pos':'neg'}">${chg>=0?'+':''}${pc}%</span>`;}
+    }catch(e){}
+  }
+}
+
+async function fetchPrices(){
+  const icon=document.getElementById('refIcon');
+  icon.innerHTML='<span class="spinner"></span>';
+  document.getElementById('liveDot').className='live-dot stale';
+  document.getElementById('mktDot').className='live-dot stale';
+  for(const s of P.stocks){
+    try{
+      const url=`https://query1.finance.yahoo.com/v8/finance/chart/${s.symbol}?interval=1d&range=1d`;
+      const r=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+      const d=await r.json();const price=d?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if(price)s.ltp=Math.round(price*100)/100;
+    }catch(e){}
+  }
+  icon.textContent='↻';
+  document.getElementById('liveDot').className='live-dot';
+  document.getElementById('mktDot').className='live-dot';
+  document.getElementById('lastUp').textContent='Updated '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  save();render();
+}
+
+function exportCSV(){
+  let csv='Type,Name,Qty/Units,Avg Cost,Current,Value,P&L\n';
+  P.stocks.forEach(s=>{const v=s.ltp?s.qty*s.ltp:s.qty*s.avgCost;csv+=`Stock,${s.symbol}-${s.name},${s.qty},${s.avgCost},${s.ltp||''},${Math.round(v)},${s.ltp?Math.round(s.qty*(s.ltp-s.avgCost)):''}\n`});
+  P.mf.forEach(f=>{const v=f.units*f.currNav;csv+=`MF,${f.scheme},${f.units},${f.avgNav},${f.currNav},${Math.round(v)},${Math.round(v-f.units*f.avgNav)}\n`});
+  P.bonds.forEach(b=>{csv+=`Bond,${b.issuer},${b.units},${b.face},,${b.face*b.units},${Math.round(b.face*b.units*b.coupon/100)} annual\n`});
+  P.rd.forEach(r=>{csv+=`RD,${r.bank},${r.tenure}mo,${r.monthly}/mo,,${rdMat(r)},${rdInt(r)}\n`});
+  P.dividends.forEach(d=>{csv+=`Dividend,${d.co},${d.qty},${d.amt}/sh,,${d.amt*d.qty},${d.status}\n`});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='portfolio-pro.csv';a.click();
+}
+
+render();fetchPrices();fetchMarket();setInterval(fetchMarket,60000);
+</script>
+</body>
+</html>
